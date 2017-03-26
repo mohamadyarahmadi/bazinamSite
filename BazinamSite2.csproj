@@ -159,6 +159,7 @@
     <Content Include="Areas\Admin\Views\News\Create.cshtml" />
     <Content Include="Content\images\kendoui.ttf" />
     <Content Include="Content\images\kendoui.woff" />
+    <Content Include="Areas\Admin\Views\News\Details.cshtml" />
     <None Include="scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="scripts\bootstrap.js" />
     <Content Include="scripts\bootstrap.min.js" />
@@ -171,6 +172,7 @@
     <Content Include="scripts\jquery.validate.unobtrusive.js" />
     <Content Include="scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="scripts\kendo.all.min.js" />
+    <Content Include="scripts\kendo.data.min.js" />
     <Content Include="scripts\modernizr-2.6.2.js" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -179,6 +181,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\NewsController.cs" />
+    <Compile Include="Areas\Admin\ViewModel\KendoGridDataSourceRequest.cs" />
     <Compile Include="Areas\Admin\ViewModel\NewsVM.cs" />
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Global.asax.cs">

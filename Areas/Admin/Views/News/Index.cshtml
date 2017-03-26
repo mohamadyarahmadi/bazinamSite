@@ -1,45 +1,59 @@
-﻿@model IEnumerable<BazinamSite2.Areas.Admin.ViewModel.News>
-
-@{
+﻿@{
     ViewBag.Title = "Index";
 }
-
-<h2>Index</h2>
-
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Content)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.ReleaseDate)
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Title)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Content)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.ReleaseDate)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.NewsID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.NewsID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.NewsID })
-        </td>
-    </tr>
+@section Styles {
+    <style>
+        .btn{margin: 5px;}
+    </style>
 }
+<div >
+    <div id="window">
+        <div id="grid"> </div > <script >
+                                     $(document).ready(function () {
+                                        $("#grid").kendoGrid({
+                                            groupable: true,
+                                            pageable: true,
+                                            sortable: true,
+                                            dataSource: {
+                                                type: "json",
+                                                transport: {
+                                                    read: {
+                                                        url: "GetNewsWithPagging"
+                                                    }
+                                                },
+                                                pageSize: 4,
+                                                serverPaging: true,
+                                                serverSorting: true,
+                                                serverFiltering: true,
+                                                serverGrouping: true,
+                                                serverAggregates: true,
+                                                schema: {
+                                                    data: "data",
+                                                    total: "total"
+                                                }
+                                            },
+                                            columns: [{
+                        
+                                                field: "Title",
+                                                title: "عنوان خبر"
 
-</table>
+                                            },
+                                            {
+                                                field: "Content",
+                                                title:"متن خبر"
+                                            },
+                                            {
+                                                field:"ReleaseDate",
+                                                title:"تاریخ خبر"
+                                            },
+                                            {
+                                                template: "<a class='btn btn-info' href='Detail/#:data.NewsID#'>نمایش</a><br/><a  class='btn btn-primary' href='Edit/#:data.NewsID#'>ویرایش</a><br/><a class='btn btn-danger' href='Delete/#:data.NewsID#'>حذف</a>",
+                                                title: "ویرایش"
+                                            }]
+
+                                        });
+           
+
+                                    });
+                                </script > </div > </div >
+        

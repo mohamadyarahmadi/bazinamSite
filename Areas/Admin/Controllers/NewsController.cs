@@ -1,39 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using BazinamSite2.Areas.Admin.ViewModel;
 using BazinamSite2.Models;
+using Newtonsoft.Json;
+using Picture = BazinamSite2.Models.Picture;
 
 namespace BazinamSite2.Areas.Admin.Controllers
 {
     public class NewsController : Controller
     {
         // GET: Admin/News
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
+        {
+            return View();
+        }
+        public async Task<JsonResult> GetNewsPicWithPagging([Bind(Prefix = "pageSize")]int pageSize = 10, [Bind(Prefix = "page")]int page=1)
         {
             using (SystemDbContext context = new SystemDbContext())
             {
-                var newsVM = await context.News
-                  .Select(x => new BazinamSite2.Areas.Admin.ViewModel.News()
-                    {
-                     NewsID= x.NewsID,
-                    Title = x.Title,
-                    Content = x.Content,
-                    ReleaseDate = x.ReleaseDate
-                     }).ToListAsync();
-                return View(newsVM);
+                var total1 = await context.Pictures.CountAsync();
+                var PictureVM = await context.Pictures
+                  .Select(x => new BazinamSite2.Areas.Admin.ViewModel.Picture()
+                  {
+                      PictureID = x.PictureID,
+                      PicName = x.PicName,
+                      PicUrl = x.PicUrl
+                  }).OrderBy(row=>row.PictureID).Skip((page-1)*10).Take(pageSize).ToListAsync();
+                return Json(new {total = total1, data = PictureVM },JsonRequestBehavior.AllowGet);
             }
         }
-
-        // GET: Admin/News/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> GetImage(int? id)
         {
-            return View();
+            using (SystemDbContext context = new SystemDbContext())
+            {
+                BazinamSite2.Models.Picture pic=new BazinamSite2.Models.Picture();
+                pic=await context.Pictures.FindAsync(id);
+                return base.File(pic.PicSourceBytes, "image/jpeg");
+            }
+        }
+        public async Task<JsonResult> GetNewsWithPagging([Bind(Prefix = "pageSize")]int pageSize = 10, [Bind(Prefix = "page")]int page = 1)
+        {
+            using (SystemDbContext context = new SystemDbContext())
+            {
+                
+                PersianCalendar pc = new PersianCalendar();
+                var total1 = await context.News.CountAsync();
+                var PictureVM = await context.News
+                  .Select(x => new BazinamSite2.Areas.Admin.ViewModel.News()
+                  {
+                       NewsID= x.NewsID,
+                      Title = x.Title,
+                      Content = x.Content.Substring(0,x.Content.Length>50?50:x.Content.Length-1),
+                      ReleaseDate = x.ReleaseDate.ToString()
+                  }).OrderBy(row => row.NewsID).Skip((page - 1) * 10).Take(pageSize).ToListAsync();
+                return Json(new { total = total1, data = PictureVM }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        // GET: Admin/News/Details/5
+        public async Task<ActionResult> Details(int id)
+        {
+            using (SystemDbContext context = new SystemDbContext())
+            {
+                var result = await context.News.Where(i=>i.NewsID==id)
+                    .Select(x => new BazinamSite2.Areas.Admin.ViewModel.News()
+                    {
+                        Title = x.Title,
+                        Content = x.Content,
+                        ReleaseDate = x.ReleaseDate.ToString()
+                    }).FirstAsync();
+                return View(result);
+            }
         }
 
         // GET: Admin/News/Create
@@ -55,15 +99,15 @@ namespace BazinamSite2.Areas.Admin.Controllers
                     {
                         Title = _new.Title,
                         Content = _new.Content,
-                        ReleaseDate = _new.ReleaseDate
+                        ReleaseDate = DateTime.Parse(_new.ReleaseDate)
                     };
-                    if (ViewBag.NewsFile != null)
+                    if (Session["NewsFile"] != null)
                     {
-                        var files = (List<string>) ViewBag.NewsFile;
+                        var files = (List<string>)Session["NewsFile"];
                         foreach (var fileName in files)
                         {
                             byte[] result;
-                            using (FileStream SourceStream = System.IO.File.Open(fileName, FileMode.Open))
+                            using (FileStream SourceStream = System.IO.File.Open(Server.MapPath("~/Areas/Admin/TempPic/") + fileName, FileMode.Open))
                             {
                                 result = new byte[SourceStream.Length];
                                 await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
@@ -106,12 +150,12 @@ namespace BazinamSite2.Areas.Admin.Controllers
 
                     // The files are not actually saved in this demo
                      file.SaveAs(physicalPath);
-                    if (ViewBag.NewsFile == null)
+                    if (Session["NewsFile"]  == null)
                     {
                         var picList = new List<string>();
-                        ViewBag.NewsFile = picList;
+                        Session["NewsFile"] = picList;
                     }
-                    ((List<string>)ViewBag.NewsFile).Add(fileName);
+                    ((List<string>)Session["NewsFile"]).Add(fileName);
                 }
             }
             
@@ -135,9 +179,9 @@ namespace BazinamSite2.Areas.Admin.Controllers
                     {
                         // The files are not actually removed in this demo
                         System.IO.File.Delete(physicalPath);
-                        if (ViewBag.NewsFile != null)
+                        if (Session["NewsFile"] != null)
                         {
-                            ((List<string>)ViewBag.NewsFile).Remove(fileName);
+                            ((List<string>)Session["NewsFile"]).Remove(fileName);
                         }
                     
                     }

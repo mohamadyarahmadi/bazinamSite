@@ -20,7 +20,7 @@ namespace BazinamSite2
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            Database.SetInitializer<SystemDbContext>(new DropCreateDatabaseIfModelChanges<SystemDbContext>());
+            //Database.SetInitializer<SystemDbContext>(new DropCreateDatabaseIfModelChanges<SystemDbContext>());
         }
     }
 }

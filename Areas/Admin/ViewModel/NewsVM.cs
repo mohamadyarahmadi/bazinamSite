@@ -17,7 +17,7 @@ namespace BazinamSite2.Areas.Admin.ViewModel
         [DataType(DataType.MultilineText)]
         public string Content { get; set; }
         [Required]
-        public DateTime ReleaseDate { get; set; }
+        public string ReleaseDate { get; set; }
     }
     public class Picture
     {
@@ -26,8 +26,6 @@ namespace BazinamSite2.Areas.Admin.ViewModel
 
         public string PicName { get; set; }
         public string PicUrl { get; set; }
-        public bool IsRefrence { get; set; }
-        public byte[] PicSourceBytes { get; set; }
 
 
     }

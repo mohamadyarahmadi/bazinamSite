@@ -7,6 +7,12 @@ namespace BazinamSite2.Models
 {
     public class News
     {
+        public News()
+        {
+            PicturescCollection=new List<Picture>();
+            CommentsCollection=new List<Comment>();
+        }
+
         public int NewsID { get; set; }
         
         public string Title { get; set; }
