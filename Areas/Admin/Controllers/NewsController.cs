@@ -58,7 +58,7 @@ namespace BazinamSite2.Areas.Admin.Controllers
                   {
                        NewsID= x.NewsID,
                       Title = x.Title,
-                      Content = x.Content.Substring(0,x.Content.Length>50?50:x.Content.Length-1),
+                      Content = x.Content.Substring(0,x.Content.Length>50?50:x.Content.Length),
                       ReleaseDate = x.ReleaseDate.ToString()
                   }).OrderBy(row => row.NewsID).Skip((page - 1) * 10).Take(pageSize).ToListAsync();
                 return Json(new { total = total1, data = PictureVM }, JsonRequestBehavior.AllowGet);
@@ -72,6 +72,7 @@ namespace BazinamSite2.Areas.Admin.Controllers
                 var result = await context.News.Where(i=>i.NewsID==id)
                     .Select(x => new BazinamSite2.Areas.Admin.ViewModel.News()
                     {
+                        NewsID = x.NewsID,
                         Title = x.Title,
                         Content = x.Content,
                         ReleaseDate = x.ReleaseDate.ToString()
@@ -129,7 +130,7 @@ namespace BazinamSite2.Areas.Admin.Controllers
                         await context.SaveChangesAsync();
                     }
                 }
-                return RedirectToAction("Index");
+                return RedirectToAction("/Index");
             }
             catch
             {
@@ -192,20 +193,42 @@ namespace BazinamSite2.Areas.Admin.Controllers
             return Content("");
         }
         // GET: Admin/News/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            using (SystemDbContext context = new SystemDbContext())
+            {
+                var result = await context.News.Where(i => i.NewsID == id)
+                    .Select(x => new BazinamSite2.Areas.Admin.ViewModel.News()
+                    {
+                        NewsID = x.NewsID,
+                        Title = x.Title,
+                        Content = x.Content,
+                        ReleaseDate = x.ReleaseDate.ToString()
+                    }).FirstAsync();
+                return View(result);
+            }
         }
 
         // POST: Admin/News/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public async Task<ActionResult> Edit(int id, BazinamSite2.Areas.Admin.ViewModel.News _new)
         {
             try
             {
                 // TODO: Add update logic here
-
-                return RedirectToAction("Index");
+                var editedNews = new BazinamSite2.Models.News()
+                {
+                    NewsID = id,
+                    Title = _new.Title,
+                    Content = _new.Content,
+                    ReleaseDate = DateTime.Parse(_new.ReleaseDate)
+                };
+                using (SystemDbContext context=new SystemDbContext())
+                {
+                    context.Entry(editedNews).State = System.Data.Entity.EntityState.Modified;
+                    await context.SaveChangesAsync();
+                }
+                return RedirectToAction("/Index");
             }
             catch
             {
@@ -214,20 +237,37 @@ namespace BazinamSite2.Areas.Admin.Controllers
         }
 
         // GET: Admin/News/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            using (SystemDbContext context = new SystemDbContext())
+            {
+                var result = await context.News.Where(i => i.NewsID == id)
+                    .Select(x => new BazinamSite2.Areas.Admin.ViewModel.News()
+                    {
+                        NewsID = x.NewsID,
+                        Title = x.Title,
+                        Content = x.Content,
+                        ReleaseDate = x.ReleaseDate.ToString()
+                    }).FirstAsync();
+                return View(result);
+            }
+
         }
 
         // POST: Admin/News/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public async Task<ActionResult> Delete(int id, FormCollection collection)
         {
             try
             {
                 // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
+                using (SystemDbContext context = new SystemDbContext())
+                {
+                    var deletedNews = await context.News.FindAsync(id);
+                    context.News.Remove(deletedNews);
+                    await context.SaveChangesAsync();
+                }
+                return RedirectToAction("/Index");
             }
             catch
             {

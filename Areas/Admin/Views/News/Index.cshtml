@@ -6,6 +6,7 @@
         .btn{margin: 5px;}
     </style>
 }
+<a href="Create">افزودن خبر</a>
 <div >
     <div id="window">
         <div id="grid"> </div > <script >
@@ -23,7 +24,6 @@
                                                 },
                                                 pageSize: 4,
                                                 serverPaging: true,
-                                                serverSorting: true,
                                                 serverFiltering: true,
                                                 serverGrouping: true,
                                                 serverAggregates: true,
@@ -32,6 +32,8 @@
                                                     total: "total"
                                                 }
                                             },
+                                            sortable: true,
+                                            groupable: false,
                                             columns: [{
                         
                                                 field: "Title",
@@ -47,7 +49,7 @@
                                                 title:"تاریخ خبر"
                                             },
                                             {
-                                                template: "<a class='btn btn-info' href='Detail/#:data.NewsID#'>نمایش</a><br/><a  class='btn btn-primary' href='Edit/#:data.NewsID#'>ویرایش</a><br/><a class='btn btn-danger' href='Delete/#:data.NewsID#'>حذف</a>",
+                                                template: "<a class='btn btn-info' href='Details/#:data.NewsID#'>نمایش</a><br/><a  class='btn btn-primary' href='Edit/#:data.NewsID#'>ویرایش</a><br/><a class='btn btn-danger' href='Delete/#:data.NewsID#'>حذف</a>",
                                                 title: "ویرایش"
                                             }]
 
